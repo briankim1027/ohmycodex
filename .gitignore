@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.pytest_cache/
+
+# runtime
+logs/*.log
+state/*.json
+!state/.gitkeep
+
+# OAuth secrets and copies
+credentials/*.json
+*.json
+firebase-debug.log
