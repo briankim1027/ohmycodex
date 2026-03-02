@@ -15,7 +15,8 @@ from threads_obsidian.collector import collect_posts
 from threads_obsidian.config import ProjectConfig, Settings, load_accounts, parse_accounts_override
 from threads_obsidian.drive_client import DriveClientConfig, DriveUploadError, GoogleDriveUploader
 from threads_obsidian.state_store import StateStore, resolve_collect_window
-from threads_obsidian.threads_client import HttpThreadsAdapter, HttpThreadsAdapterConfig, ThreadsAPIError
+from threads_obsidian.threads_client import ThreadsAPIError
+from threads_obsidian.scraper_client import PlaywrightThreadsAdapter, PlaywrightThreadsAdapterConfig
 from threads_obsidian.time_utils import KST, utc_now
 
 app = typer.Typer(help="Threads posts collector to Obsidian markdown on Google Drive")
@@ -27,17 +28,12 @@ def _build_project_config() -> tuple[ProjectConfig, Settings]:
     return ProjectConfig(project_root=project_root, settings=settings), settings
 
 
-def _build_threads_client(settings: Settings) -> HttpThreadsAdapter:
-    return HttpThreadsAdapter(
-        HttpThreadsAdapterConfig(
-            access_token=settings.threads_access_token,
-            base_url=settings.threads_api_base_url,
-            profile_lookup_endpoint=settings.threads_profile_lookup_endpoint,
-            user_threads_endpoint_template=settings.threads_user_threads_endpoint_template,
-            posts_fields=settings.threads_posts_fields,
-            posts_limit=settings.threads_posts_limit,
-            timeout_seconds=settings.threads_timeout_seconds,
-            max_retries=settings.threads_max_retries,
+def _build_threads_client(settings: Settings) -> PlaywrightThreadsAdapter:
+    # Use the Playwright Scraper instead of the official API
+    return PlaywrightThreadsAdapter(
+        PlaywrightThreadsAdapterConfig(
+            headless=False,
+            timeout_seconds=45
         )
     )
 
